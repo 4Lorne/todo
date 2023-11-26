@@ -33,6 +33,7 @@ pub fn open_file(file_name: &str) -> std::io::Result<()> {
         while !exit {
             let mut s = String::new();
             print!("Specify a line to add or change, followed by the task you wish to add. \n");
+
             let _ = stdout().flush();
             stdin().read_line(&mut s).expect("Error");
             if s.contains("!Exit") {
