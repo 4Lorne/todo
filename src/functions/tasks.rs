@@ -1,6 +1,7 @@
+//use crate::functions::open_file::clear_and_print_file;
 use std::fs::File;
 use std::io;
-use std::io::{stdin, stdout, BufRead, BufReader, Seek, SeekFrom, Write};
+use std::io::{stdin, stdout, Write};
 
 pub fn add_task(file: &mut File) {
     let mut s = String::new();

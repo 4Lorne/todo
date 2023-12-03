@@ -4,8 +4,8 @@ mod functions;
 use args::TodoArgs;
 use clap::Parser;
 use functions::create_file::create_file;
+use functions::delete_file::delete_file;
 use functions::open_file::open_file;
-use crate::functions::delete_file::delete_file;
 
 /// TODO
 /// Installation
@@ -16,9 +16,11 @@ use crate::functions::delete_file::delete_file;
 
 fn main() {
     let args = TodoArgs::parse();
+
+    // Clears the terminal
     print!("\x1B[2J");
 
-
+    //Parses the arguments and calls the appropriate function
     match args.first_arg.as_str() {
         "create" => {
             create_file(args.second_arg.as_str()).expect("TODO: panic message");

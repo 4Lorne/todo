@@ -4,7 +4,7 @@ use delete_file::file_exists;
 use dialoguer::Select;
 
 use std::fs::OpenOptions;
-use std::io::{BufRead, BufReader, Seek, SeekFrom};
+use std::io::{BufRead, BufReader, Read, Seek, SeekFrom};
 use std::vec;
 
 pub fn open_file(file_name: &str) -> std::io::Result<()> {
@@ -16,14 +16,16 @@ pub fn open_file(file_name: &str) -> std::io::Result<()> {
             .open(file_name)
             .expect("cannot open file");
 
-        let reader = BufReader::new(&file);
-
-        print_file(reader);
-
-        file.seek(SeekFrom::End(0)).expect("seek to end failed");
+        clear_and_print_file(&file);
 
         loop {
-            let items = vec!["Add a new Task", "Delete a Task", "Exit"];
+            let items = vec![
+                "Add a new Task",
+                "Modify a Task",
+                "Mark a Task as Complete",
+                "Delete a Task",
+                "Exit",
+            ];
             let selection = Select::new()
                 .with_prompt("Select an action")
                 .default(0)
@@ -31,15 +33,25 @@ pub fn open_file(file_name: &str) -> std::io::Result<()> {
                 .interact()
                 .unwrap();
 
+            file.seek(SeekFrom::Start(0)).expect("seek to start failed");
+            clear_and_print_file(&file);
+
             match selection {
                 0 => {
                     add_task(&mut file);
                 }
                 1 => {
-                    delete_task(&mut file).expect("TODO: panic message");
+                    //Modify task
                 }
                 2 => {
+                    //Mark task as complete
+                }
+                3 => {
+                    delete_task(&mut file).expect("TODO: panic message");
+                }
+                4 => {
                     println!("Exiting...");
+                    break;
                 }
                 _ => {
                     println!("Invalid input. Please enter [1] or [Exit].");
@@ -87,4 +99,11 @@ fn print_file<T: BufRead>(reader: T) {
             }
         }
     }
+}
+
+//Clears the terminal and prints the contents of the file
+fn clear_and_print_file<F: Read>(file: F) {
+    print!("\x1B[2J");
+    let reader = BufReader::new(file);
+    print_file(reader);
 }
