@@ -1,10 +1,11 @@
 //use crate::functions::open_file::clear_and_print_file;
-use std::fs::File;
+use std::fs::{File, OpenOptions};
 use std::io::{self, BufRead, BufReader};
 use std::io::{stdin, stdout, Write};
 
 use dialoguer::Select;
 
+/// Adds a new task to the list
 pub fn add_task(file: &mut File) {
     let mut s = String::new();
 
@@ -16,8 +17,10 @@ pub fn add_task(file: &mut File) {
     file.write(s.as_bytes()).expect("Write failed");
 }
 
-pub fn modify_task(file: &File) {
-    let lines: Vec<String> = BufReader::new(file)
+/// Modifies an existing task on the list
+pub fn modify_task(file: &File, file_name: &str) {
+    // Reads the file into a vector
+    let mut lines: Vec<String> = BufReader::new(file)
         .lines()
         .map(|line| line.expect("Error reading line"))
         .collect();
@@ -34,12 +37,28 @@ pub fn modify_task(file: &File) {
         .interact()
         .unwrap();
 
-    match selection {
-        0 => {
-            println!("Exiting...");
-        }
-        _ => {}
+    // Directly modifying the line in the vector
+    lines[selection] = modify_line(lines[selection].to_string(), selection);
+
+    // Rewrites the file with the modified line
+    let mut file = OpenOptions::new()
+        .write(true)
+        .open(file_name)
+        .expect("cannot open file");
+
+    for line in &lines {
+        writeln!(file, "{}", line).expect("cannot write to file");
     }
+}
+
+pub fn modify_line(line: String, index: usize) -> String {
+    let mut s = String::new();
+
+    print!("Modifying Task #{}: {} \n", index + 1, line);
+
+    let _ = stdout().flush();
+    stdin().read_line(&mut s).expect("Error");
+    return s.trim_end().to_string();
 }
 
 pub fn delete_task(file: &mut File) -> io::Result<&File> {

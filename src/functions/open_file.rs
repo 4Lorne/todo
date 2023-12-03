@@ -38,7 +38,7 @@ pub fn open_file(file_name: &str) -> std::io::Result<()> {
             match selection {
                 0 => add_task(&mut file),
 
-                1 => modify_task(&mut file),
+                1 => modify_task(&mut file, &file_name),
 
                 2 => {
                     //Mark task as complete
