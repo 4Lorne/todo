@@ -16,7 +16,7 @@ use crate::functions::delete_file::delete_file;
 
 fn main() {
     let args = TodoArgs::parse();
-    //print!("\x1B[2J");
+    print!("\x1B[2J");
 
 
     match args.first_arg.as_str() {
