@@ -1,5 +1,5 @@
 use crate::functions::delete_file;
-use crate::functions::tasks::{add_task, delete_task};
+use crate::functions::tasks::{add_task, delete_task, modify_task};
 use delete_file::file_exists;
 use dialoguer::Select;
 
@@ -16,9 +16,9 @@ pub fn open_file(file_name: &str) -> std::io::Result<()> {
             .open(file_name)
             .expect("cannot open file");
 
-        clear_and_print_file(&file);
-
         loop {
+            clear_and_print_file(&file);
+
             let items = vec![
                 "Add a new Task",
                 "Modify a Task",
@@ -34,15 +34,12 @@ pub fn open_file(file_name: &str) -> std::io::Result<()> {
                 .unwrap();
 
             file.seek(SeekFrom::Start(0)).expect("seek to start failed");
-            clear_and_print_file(&file);
 
             match selection {
-                0 => {
-                    add_task(&mut file);
-                }
-                1 => {
-                    //Modify task
-                }
+                0 => add_task(&mut file),
+
+                1 => modify_task(&mut file),
+
                 2 => {
                     //Mark task as complete
                 }
@@ -57,31 +54,9 @@ pub fn open_file(file_name: &str) -> std::io::Result<()> {
                     println!("Invalid input. Please enter [1] or [Exit].");
                 }
             }
+
+            file.seek(SeekFrom::Start(0)).expect("seek to start failed");
         }
-
-        // loop {
-        //     let mut s = String::new();
-
-        //     print!("Specify an action. [1] to add a new task. [Exit] to exit.\n");
-
-        //     let _ = stdout().flush();
-        //     stdin().read_line(&mut s).expect("Error");
-
-        //     match s.trim() {
-        //         "1" => {
-        //             add_task(&mut file);
-        //         }
-        //         "2" => {
-        //             delete_task(&mut file).expect("TODO: panic message");
-        //         }
-        //         "0" => {
-        //             break;
-        //         }
-        //         _ => {
-        //             println!("Invalid input. Please enter [1] or [Exit].");
-        //         }
-        //     }
-        // }
     }
 
     Ok(())

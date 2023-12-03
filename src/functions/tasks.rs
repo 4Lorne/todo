@@ -1,17 +1,45 @@
 //use crate::functions::open_file::clear_and_print_file;
 use std::fs::File;
-use std::io;
+use std::io::{self, BufRead, BufReader};
 use std::io::{stdin, stdout, Write};
+
+use dialoguer::Select;
 
 pub fn add_task(file: &mut File) {
     let mut s = String::new();
 
-    print!("Specify a line to add or change, followed by the task you wish to add. \n");
+    print!("Add a new Task \n");
 
     let _ = stdout().flush();
     stdin().read_line(&mut s).expect("Error");
 
     file.write(s.as_bytes()).expect("Write failed");
+}
+
+pub fn modify_task(file: &File) {
+    let lines: Vec<String> = BufReader::new(file)
+        .lines()
+        .map(|line| line.expect("Error reading line"))
+        .collect();
+
+    if lines.is_empty() {
+        println!("No tasks to select from.");
+        return;
+    }
+
+    let selection = Select::new()
+        .with_prompt("Select a line to modify:")
+        .default(0)
+        .items(&lines[..])
+        .interact()
+        .unwrap();
+
+    match selection {
+        0 => {
+            println!("Exiting...");
+        }
+        _ => {}
+    }
 }
 
 pub fn delete_task(file: &mut File) -> io::Result<&File> {
