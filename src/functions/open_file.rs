@@ -30,7 +30,7 @@ pub fn open_file(file_name: &str) -> std::io::Result<()> {
             .map(|s| s.to_string())
             .collect();
 
-            let selection = selection(items, String::from("Select a task:"));
+            let selection = selection(items, String::from("Select a task"));
 
             file.seek(SeekFrom::Start(0)).expect("seek to start failed");
 

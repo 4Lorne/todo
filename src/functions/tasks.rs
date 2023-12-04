@@ -34,7 +34,7 @@ pub fn modify_task(file: &File, file_name: &str) {
     }
 
     let selection = Select::new()
-        .with_prompt("Select a task to modify:")
+        .with_prompt("Select a task to modify")
         .default(0)
         .items(&lines[..])
         .interact()
@@ -76,7 +76,7 @@ pub fn complete_task(file: &File, file_name: &str) {
 
     let selection = selection(
         lines.clone(),
-        String::from("Select a task to mark completed:"),
+        String::from("Select a task to mark completed"),
     );
 
     if lines[selection].contains("~~") {
@@ -101,7 +101,7 @@ pub fn delete_task(file: &mut File, file_name: &str) {
         return;
     }
 
-    let selection = selection(lines.clone(), String::from("Select a task to delete:"));
+    let selection = selection(lines.clone(), String::from("Select a task to delete"));
 
     lines.remove(selection);
 
