@@ -1,6 +1,6 @@
 use std::fs::{File, OpenOptions};
-use std::io::{self, BufRead, BufReader};
 use std::io::{stdin, stdout, Write};
+use std::io::{BufRead, BufReader};
 
 use dialoguer::Select;
 
@@ -12,6 +12,10 @@ pub fn add_task(file: &mut File) {
 
     let _ = stdout().flush();
     stdin().read_line(&mut s).expect("Error");
+
+    if s.trim().is_empty() {
+        return;
+    }
 
     file.write(s.as_bytes()).expect("Write failed");
 }
@@ -39,9 +43,14 @@ pub fn modify_task(file: &File, file_name: &str) {
     // Directly modifying the line in the vector
     lines[selection] = modify_line(lines[selection].to_string(), selection);
 
+    if lines[selection].is_empty() {
+        return;
+    }
+
     // Rewrites the file with the modified line
     let mut file = OpenOptions::new()
         .write(true)
+        .truncate(true)
         .open(file_name)
         .expect("cannot open file");
 
@@ -57,6 +66,7 @@ pub fn modify_line(line: String, index: usize) -> String {
 
     let _ = stdout().flush();
     stdin().read_line(&mut s).expect("Error");
+
     return s.trim_end().to_string();
 }
 
@@ -79,10 +89,16 @@ pub fn complete_task(file: &File, file_name: &str) {
         .interact()
         .unwrap();
 
-    lines[selection] = format!("~~{}~~", lines[selection]);
+    if lines[selection].contains("~~") {
+        lines[selection] = lines[selection].replace("~~", "");
+        return;
+    } else {
+        lines[selection] = format!("~~{}~~", lines[selection]);
+    }
 
     let mut file = OpenOptions::new()
         .write(true)
+        .truncate(true)
         .open(file_name)
         .expect("cannot open file");
 
