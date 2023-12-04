@@ -31,7 +31,7 @@ pub fn list_files(directory: String) {
     } else {
         file_paths.push(String::from("Create a new file"));
 
-        let selection = selection(file_paths.clone(), String::from("Select an existing file:"));
+        let selection = selection(file_paths.clone(), String::from("Select an existing file"));
 
         if file_paths[selection] == "Create a new file" {
             new_file()
