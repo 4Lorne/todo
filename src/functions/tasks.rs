@@ -1,4 +1,3 @@
-//use crate::functions::open_file::clear_and_print_file;
 use std::fs::{File, OpenOptions};
 use std::io::{self, BufRead, BufReader};
 use std::io::{stdin, stdout, Write};
@@ -31,7 +30,7 @@ pub fn modify_task(file: &File, file_name: &str) {
     }
 
     let selection = Select::new()
-        .with_prompt("Select a line to modify:")
+        .with_prompt("Select a task to modify:")
         .default(0)
         .items(&lines[..])
         .interact()
@@ -61,51 +60,65 @@ pub fn modify_line(line: String, index: usize) -> String {
     return s.trim_end().to_string();
 }
 
-pub fn delete_task(file: &mut File) -> io::Result<&File> {
-    // let mut s = String::new();
+/// Modifies a line with a strikethrough
+pub fn complete_task(file: &File, file_name: &str) {
+    let mut lines: Vec<String> = BufReader::new(file)
+        .lines()
+        .map(|line| line.expect("Error reading line"))
+        .collect();
 
-    // print!("Specify a line number to delete: ");
-    // let _ = io::stdout().flush();
-    // io::stdin().read_line(&mut s)?;
+    if lines.is_empty() {
+        println!("No tasks to select from.");
+        return;
+    }
 
-    // // Parse the input as a line number
-    // let line_number: usize = match s.trim().parse() {
-    //     Ok(num) => num,
-    //     Err(_) => {
-    //         println!("Invalid input. Please enter a valid line number.");
-    //         return Ok(file);
-    //     }
-    // };
+    let selection = Select::new()
+        .with_prompt("Select a task to mark completed:")
+        .default(0)
+        .items(&lines[..])
+        .interact()
+        .unwrap();
 
-    // // Read the file line by line
-    // let reader = BufReader::new(&file);
-    // let lines: Vec<String> = reader
-    //     .lines()
-    //     .map(|line| line.expect("Error reading line"))
-    //     .collect();
+    lines[selection] = format!("~~{}~~", lines[selection]);
 
-    // // Check if the line number is valid
-    // if line_number > 0 && line_number <= lines.len() {
-    //     // Create a new Vec excluding the line to be deleted
-    //     let updated_lines: Vec<&str> = lines
-    //         .iter()
-    //         .enumerate()
-    //         .filter(|&(index, _)| index + 1 != line_number)
-    //         .map(|(_, line)| line.as_str())
-    //         .collect();
+    let mut file = OpenOptions::new()
+        .write(true)
+        .open(file_name)
+        .expect("cannot open file");
 
-    //     // Clear the file and write the updated lines back
-    //     file.seek(SeekFrom::Start(0))?; // Move the cursor to the beginning of the file
-    //     file.set_len(0)?; // Clear the file
+    for line in &lines {
+        writeln!(file, "{}", line).expect("cannot write to file");
+    }
+}
 
-    //     for line in updated_lines {
-    //         writeln!(file, "{}", line)?;
-    //     }
+/// Deletes a task from the list
+pub fn delete_task(file: &mut File, file_name: &str) {
+    let mut lines: Vec<String> = BufReader::new(file)
+        .lines()
+        .map(|line| line.expect("Error reading line"))
+        .collect();
 
-    //     println!("Line {} deleted successfully.", line_number);
-    // } else {
-    //     println!("Invalid line number. Please enter a valid line number.");
-    // }
+    if lines.is_empty() {
+        println!("No tasks to select from.");
+        return;
+    }
 
-    Ok(file)
+    let selection = Select::new()
+        .with_prompt("Select a task to delete:")
+        .default(0)
+        .items(&lines[..])
+        .interact()
+        .unwrap();
+
+    lines.remove(selection);
+
+    let mut file = OpenOptions::new()
+        .write(true)
+        .truncate(true)
+        .open(file_name)
+        .expect("cannot open file");
+
+    for line in &lines {
+        writeln!(file, "{}", line).expect("cannot write to file");
+    }
 }

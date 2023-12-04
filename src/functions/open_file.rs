@@ -1,5 +1,5 @@
 use crate::functions::delete_file;
-use crate::functions::tasks::{add_task, delete_task, modify_task};
+use crate::functions::tasks::{add_task, complete_task, delete_task, modify_task};
 use delete_file::file_exists;
 use dialoguer::Select;
 
@@ -40,12 +40,10 @@ pub fn open_file(file_name: &str) -> std::io::Result<()> {
 
                 1 => modify_task(&mut file, &file_name),
 
-                2 => {
-                    //Mark task as complete
-                }
-                3 => {
-                    delete_task(&mut file).expect("TODO: panic message");
-                }
+                2 => complete_task(&file, file_name),
+
+                3 => delete_task(&mut file, file_name),
+
                 4 => {
                     println!("Exiting...");
                     break;

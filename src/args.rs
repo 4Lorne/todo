@@ -1,7 +1,7 @@
-use clap::{Parser};
+use clap::Parser;
 
 #[derive(Debug, Parser)]
-#[clap(author,version,about)]
+#[clap(author, version, about)]
 pub struct TodoArgs {
     /// First argument
     pub first_arg: String,

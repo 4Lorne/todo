@@ -12,6 +12,7 @@ use functions::open_file::open_file;
 /// Ask for directory, if none provided use default directory
 /// Using
 /// Provide list of files to select
+/// Escape to go back
 ///https://crates.io/crates/aarty
 
 fn main() {
