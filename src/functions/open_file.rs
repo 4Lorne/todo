@@ -5,6 +5,7 @@ use dialoguer::Select;
 
 use std::fs::OpenOptions;
 use std::io::{BufRead, BufReader, Read, Seek, SeekFrom};
+use std::process::Command;
 use std::vec;
 
 pub fn open_file(file_name: &str) -> std::io::Result<()> {
@@ -76,7 +77,7 @@ fn print_file<T: BufRead>(reader: T) {
 
 //Clears the terminal and prints the contents of the file
 fn clear_and_print_file<F: Read>(file: F) {
-    print!("\x1B[2J");
+    Command::new("cmd").args(&["/C", "cls"]).status().unwrap();
     let reader = BufReader::new(file);
     print_file(reader);
 }

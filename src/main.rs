@@ -2,6 +2,8 @@ mod args;
 mod functions;
 mod read_config;
 
+use std::process::Command;
+
 use args::TodoArgs;
 use clap::Parser;
 use functions::create_file::create_file;
@@ -18,11 +20,12 @@ fn main() {
     let args_len = std::env::args().count() - 1;
 
     if config_exists() && args_len == 0 {
+        Command::new("cmd").args(&["/C", "cls"]).status().unwrap();
         list_files(config.directory);
     } else {
         let args: TodoArgs = TodoArgs::parse();
         // Clears the terminal
-        print!("\x1B[2J");
+        Command::new("cmd").args(&["/C", "cls"]).status().unwrap();
 
         //Parses the arguments and calls the appropriate function
         match args.first_arg.as_str() {
