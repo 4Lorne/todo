@@ -1,15 +1,17 @@
 use crate::functions::create_file::create_file;
 use crate::functions::open_file::open_file;
+use crate::functions::tasks::selection;
 
-use dialoguer::Select;
 use std::{
     fs,
     io::{stdin, stdout, Write},
 };
 
+/// Lists all the txt files in the directory specified in the config file
 pub fn list_files(directory: String) {
     let entries: Vec<_> = fs::read_dir(&directory).unwrap().collect();
 
+    //Maps the entries to a vector of strings
     let mut file_paths: Vec<_> = entries
         .into_iter()
         .filter_map(|res| {
@@ -29,12 +31,7 @@ pub fn list_files(directory: String) {
     } else {
         file_paths.push(String::from("Create a new file"));
 
-        let selection = Select::new()
-            .with_prompt("Select an existing file:")
-            .default(0)
-            .items(&file_paths)
-            .interact()
-            .unwrap();
+        let selection = selection(file_paths.clone(), String::from("Select an existing file:"));
 
         if file_paths[selection] == "Create a new file" {
             new_file()
@@ -44,6 +41,7 @@ pub fn list_files(directory: String) {
     }
 }
 
+/// Creates a new file
 fn new_file() {
     println!("Name your file:");
     let mut s = String::new();

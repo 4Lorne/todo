@@ -47,18 +47,10 @@ pub fn modify_task(file: &File, file_name: &str) {
         return;
     }
 
-    // Rewrites the file with the modified line
-    let mut file = OpenOptions::new()
-        .write(true)
-        .truncate(true)
-        .open(file_name)
-        .expect("cannot open file");
-
-    for line in &lines {
-        writeln!(file, "{}", line).expect("cannot write to file");
-    }
+    create_new_file(lines, file_name);
 }
 
+// Modifies the specified line
 pub fn modify_line(line: String, index: usize) -> String {
     let mut s = String::new();
 
@@ -82,12 +74,10 @@ pub fn complete_task(file: &File, file_name: &str) {
         return;
     }
 
-    let selection = Select::new()
-        .with_prompt("Select a task to mark completed:")
-        .default(0)
-        .items(&lines[..])
-        .interact()
-        .unwrap();
+    let selection = selection(
+        lines.clone(),
+        String::from("Select a task to mark completed:"),
+    );
 
     if lines[selection].contains("~~") {
         lines[selection] = lines[selection].replace("~~", "");
@@ -96,15 +86,7 @@ pub fn complete_task(file: &File, file_name: &str) {
         lines[selection] = format!("~~{}~~", lines[selection]);
     }
 
-    let mut file = OpenOptions::new()
-        .write(true)
-        .truncate(true)
-        .open(file_name)
-        .expect("cannot open file");
-
-    for line in &lines {
-        writeln!(file, "{}", line).expect("cannot write to file");
-    }
+    create_new_file(lines, file_name);
 }
 
 /// Deletes a task from the list
@@ -119,15 +101,15 @@ pub fn delete_task(file: &mut File, file_name: &str) {
         return;
     }
 
-    let selection = Select::new()
-        .with_prompt("Select a task to delete:")
-        .default(0)
-        .items(&lines[..])
-        .interact()
-        .unwrap();
+    let selection = selection(lines.clone(), String::from("Select a task to delete:"));
 
     lines.remove(selection);
 
+    create_new_file(lines, file_name)
+}
+
+/// Creating a new file with the updated vector to replace the old file
+fn create_new_file(lines: Vec<String>, file_name: &str) {
     let mut file = OpenOptions::new()
         .write(true)
         .truncate(true)
@@ -137,4 +119,15 @@ pub fn delete_task(file: &mut File, file_name: &str) {
     for line in &lines {
         writeln!(file, "{}", line).expect("cannot write to file");
     }
+}
+
+pub fn selection(items: Vec<String>, prompt: String) -> usize {
+    let selection = Select::new()
+        .with_prompt(prompt)
+        .default(0)
+        .items(&items[..])
+        .interact()
+        .unwrap();
+
+    return selection;
 }

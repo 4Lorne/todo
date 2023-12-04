@@ -1,7 +1,6 @@
 use crate::functions::delete_file;
-use crate::functions::tasks::{add_task, complete_task, delete_task, modify_task};
+use crate::functions::tasks::{add_task, complete_task, delete_task, modify_task, selection};
 use delete_file::file_exists;
-use dialoguer::Select;
 
 use std::fs::OpenOptions;
 use std::io::{BufRead, BufReader, Read, Seek, SeekFrom};
@@ -26,13 +25,12 @@ pub fn open_file(file_name: &str) -> std::io::Result<()> {
                 "Mark a Task as Complete",
                 "Delete a Task",
                 "Exit",
-            ];
-            let selection = Select::new()
-                .with_prompt("Select an action")
-                .default(0)
-                .items(&items[..])
-                .interact()
-                .unwrap();
+            ]
+            .into_iter()
+            .map(|s| s.to_string())
+            .collect();
+
+            let selection = selection(items, String::from("Select a task:"));
 
             file.seek(SeekFrom::Start(0)).expect("seek to start failed");
 
@@ -50,10 +48,11 @@ pub fn open_file(file_name: &str) -> std::io::Result<()> {
                     break;
                 }
                 _ => {
-                    println!("Invalid input. Please enter [1] or [Exit].");
+                    println!("Invalid input.");
                 }
             }
 
+            //Returns the cursor to the start of the file
             file.seek(SeekFrom::Start(0)).expect("seek to start failed");
         }
     }

@@ -8,8 +8,10 @@ pub struct Config {
     pub directory: String,
 }
 
+/// Reads the config file to retrieve the directory
+/// If there isn't a config file, it creates one
 pub fn read_config() -> Config {
-    if !std::path::Path::new("config.toml").exists() {
+    if !config_exists() {
         create_config();
     }
     let mut file = File::open("config.toml").expect("Unable to open config file");
@@ -19,6 +21,8 @@ pub fn read_config() -> Config {
     from_str(&contents).expect("Unable to parse config file")
 }
 
+/// Creates a config file
+/// The config file stores the directory where the files are stored
 fn create_config() {
     println!(
         "You have not set a directory yet. 
@@ -50,6 +54,7 @@ fn create_config() {
     }
 }
 
+/// Checks if the config file exists
 pub fn config_exists() -> bool {
     std::path::Path::new("config.toml").exists()
 }
